@@ -12,3 +12,12 @@ Working process:
  Weather App has been build to fetch the weather forecast from OpenWeatherMap API using unique API key and displays it in the UI. 
  Fetch and parsing the JSON data from OpenWeatherMap API and showed it to the  Weather App UI. 
  
+Steps to use the app,
+1.	Enter the city name for the weather details.
+
+2.	Weather details of a particular city and next 5 days forecast will be displayed in the app UI.
+ 
+3.	Select “Change city” from the Menulist to change the city name.
+ 
+4.	Select “Refresh” to reload the updated data of the particular city.
+ 
