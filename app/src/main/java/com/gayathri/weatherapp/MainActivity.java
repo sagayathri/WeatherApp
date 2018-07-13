@@ -1,39 +1,32 @@
 package com.gayathri.weatherapp;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.PersistableBundle;
-import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.time.chrono.MinguoChronology;
 
 public class MainActivity extends AppCompatActivity {
 
     String data;
     private static final String filename  ="Data.txt";
+    WeatherFragment wf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            this.getSupportFragmentManager().beginTransaction().add(R.id.container, new WeatherFragment()).commit();
+            WeatherFragment weatherFragment = new WeatherFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.container, weatherFragment).commit();
         }
     }
 
@@ -65,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }else{
             readAssetFile();
-            Toast.makeText(this, "Hi there, How are you today!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -73,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.change_city){
             showInputDialog(this);
+            clearAllFields();
         }else if(id == R.id.refresh ){
             TextView city_name =(TextView) findViewById(R.id.city_field);
             changeCity(city_name.getText().toString());
@@ -81,11 +76,28 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    private void clearAllFields() {
+        try {
+            if (wf != null) {
+                wf.cityfeild.setText("");
+                wf.details.setText("");
+                wf.currenttemp.setText("");
+                wf.update.setText("");
+                wf.weathericon.setImageDrawable(null);
+                wf.arrayList.clear();
+                wf.listView.setAdapter(null);
+            }
+        }catch (Exception e){throw e;}
+    }
+
     public void showInputDialog(Context context){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Enter a City");
         final EditText input = new EditText(context);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        ImageView imageView = new ImageView(context);
+        imageView.setClickable(true);
+        imageView.setImageResource(R.drawable.gps_position);
         builder.setView(input);
         builder.setPositiveButton("Go", new DialogInterface.OnClickListener() {
             @Override
@@ -96,13 +108,17 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void getMyLocation() {
+    }
+
     public void changeCity(String string) {
         if(!string.equals("")) {
-            WeatherFragment wf = (WeatherFragment) this.getSupportFragmentManager().findFragmentById(R.id.container);
+            wf = (WeatherFragment) this.getSupportFragmentManager().findFragmentById(R.id.container);
             wf.Changecity(string);
             (new CityPreference(this)).setCity(string);
-        }else
+        }else {
             showInputDialog(this);
+        }
     }
 
     @Override
@@ -150,4 +166,5 @@ public class MainActivity extends AppCompatActivity {
             e1.printStackTrace();
         }
     }
+
 }
